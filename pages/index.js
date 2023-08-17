@@ -8,7 +8,7 @@ function Home() {
       <br />
       Fabio
       <br />
-      <span style="color: red;">Michelito</span>
+      <span style={{ color: "red" }}>Michelito</span>
     </h1>
   );
 }
