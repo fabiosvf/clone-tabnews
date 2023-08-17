@@ -7,9 +7,9 @@ function Home() {
       palavras, mas te garanto que o céu é o limite onde vamos estar.
       <br />
       Fabio
+      <br />
+      <span style="color: red;">Michelito</span>
     </h1>
-    <br />
-    <h1 style="color: red;">Michelito</h1>
   );
 }
 
