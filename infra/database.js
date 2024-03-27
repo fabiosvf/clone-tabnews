@@ -35,5 +35,5 @@ function getSSLValues() {
     };
   }
 
-  return !(process.env.NODE_ENV === "development");
+  return process.env.NODE_ENV === "production";
 }
