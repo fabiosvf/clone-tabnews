@@ -47,5 +47,5 @@ function getSSLValues() {
     };
   }
 
-  return process.env.NODE_ENV !== "development";
+  return ["production", "staging"].includes(process.env.NODE_ENV);
 }
