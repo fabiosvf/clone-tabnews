@@ -67,8 +67,10 @@ async function create(userInputValues) {
 async function update(username, userInputValues) {
   const currentUser = await findOneByUsername(username);
 
-  if ("username" in userInputValues)
-    await validateUniqueUsername(userInputValues.username);
+  if ("username" in userInputValues) {
+    if (username.toLowerCase() !== userInputValues.username.toLowerCase())
+      await validateUniqueUsername(userInputValues.username);
+  }
 
   if ("email" in userInputValues)
     await validateUniqueEmail(userInputValues.email);
