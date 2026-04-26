@@ -46,18 +46,17 @@ describe("Use case: Registration Flow (all successful)", () => {
 
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
+    const tokenFromEmail = lastEmail.text.match(/\/ativar\/([a-z0-9-]+)/)[1];
 
-    const activationToken = await activation.findOneByUserId(
-      createUserResponseBody.id,
-    );
+    const activationToken =
+      await activation.findOneValidByToken(tokenFromEmail);
 
     expect(lastEmail.sender).toBe("<contato@socodigo.com.br>");
     expect(lastEmail.recipients[0]).toBe("<registration.flow@socodigo.com.br>");
     expect(lastEmail.subject).toBe("Ative seu cadastro no SóCodigo!");
     expect(lastEmail.text).toContain("RegistrationFlow");
     expect(lastEmail.text).toContain(activationToken.id);
-
-    console.log(lastEmail.text);
+    expect(createUserResponseBody.id).toEqual(activationToken.user_id);
   });
 
   test("Activate account", async () => {});

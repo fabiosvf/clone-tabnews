@@ -4,6 +4,31 @@ import webserver from "infra/webserver";
 
 const EXPIRATION_IN_MILISECONDS = 60 * 15 * 1000; // 15 minutes
 
+async function findOneValidByToken(activationToken) {
+  const token = await runSelectQuery(activationToken);
+  return token;
+
+  async function runSelectQuery(activationToken) {
+    const results = await database.query({
+      text: `
+        SELECT
+          *
+        FROM
+          user_activation_tokens
+        WHERE
+          id = $1 AND
+          used_at IS NULL AND
+          expires_at > NOW()
+        LIMIT
+          1
+      ;`,
+      values: [activationToken],
+    });
+
+    return results.rows[0];
+  }
+}
+
 async function findOneByUserId(userId) {
   const newToken = await runSelectQuery(userId);
   return newToken;
@@ -65,6 +90,7 @@ Equipe SóCódigo`,
 }
 
 const activation = {
+  findOneValidByToken,
   findOneByUserId,
   create,
   sendEmailToUser,

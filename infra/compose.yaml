@@ -10,5 +10,5 @@ services:
     container_name: "mailcatcher-dev"
     image: "sj26/mailcatcher"
     ports:
-      - "1025:1025"
-      - "1080:1080"
+      - "1026:1025"
+      - "1081:1080"
