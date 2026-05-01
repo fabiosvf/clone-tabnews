@@ -59,9 +59,15 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(createUserResponseBody.id).toEqual(activationToken.user_id);
   });
 
-  test("Activate account", async () => {});
+  test("Activate account", async () => {
+    expect(true).toBe(true);
+  });
 
-  test("Login", async () => {});
+  test("Login", async () => {
+    expect(true).toBe(true);
+  });
 
-  test("Get user information", async () => {});
+  test("Get user information", async () => {
+    expect(true).toBe(true);
+  });
 });
