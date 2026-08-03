@@ -104,9 +104,13 @@ function attachAndWait(pid) {
 
 function startFresh() {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [NEXT_BIN, "dev", "-p", String(PORT)], {
-      stdio: "inherit",
-    });
+    const child = spawn(
+      process.execPath,
+      [NEXT_BIN, "dev", "-p", String(PORT)],
+      {
+        stdio: "inherit",
+      },
+    );
 
     writeLockedPid(child.pid);
 

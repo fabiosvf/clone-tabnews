@@ -8,9 +8,13 @@ const CONTAINERS = ["postgres-dev", "mailcatcher-dev"];
 
 function isContainerRunning(name) {
   try {
-    const output = execFileSync("docker", ["inspect", "-f", "{{.State.Running}}", name], {
-      stdio: ["ignore", "pipe", "ignore"],
-    })
+    const output = execFileSync(
+      "docker",
+      ["inspect", "-f", "{{.State.Running}}", name],
+      {
+        stdio: ["ignore", "pipe", "ignore"],
+      },
+    )
       .toString()
       .trim();
     return output === "true";
@@ -26,10 +30,14 @@ function allContainersRunning() {
 function up() {
   const alreadyUp = allContainersRunning();
 
-  execFileSync("docker", ["compose", "-f", COMPOSE_FILE, "up", "-d"], { stdio: "inherit" });
+  execFileSync("docker", ["compose", "-f", COMPOSE_FILE, "up", "-d"], {
+    stdio: "inherit",
+  });
 
   if (alreadyUp) {
-    console.log("\n🟢 Serviços já estavam ativos (reaproveitando de outra sessão).\n");
+    console.log(
+      "\n🟢 Serviços já estavam ativos (reaproveitando de outra sessão).\n",
+    );
     return;
   }
 
@@ -46,7 +54,9 @@ function stop() {
   }
 
   fs.unlinkSync(OWNER_LOCKFILE);
-  execFileSync("docker", ["compose", "-f", COMPOSE_FILE, "stop"], { stdio: "inherit" });
+  execFileSync("docker", ["compose", "-f", COMPOSE_FILE, "stop"], {
+    stdio: "inherit",
+  });
   console.log("\n🟢 Serviços parados (esta sessão era a dona).\n");
 }
 
