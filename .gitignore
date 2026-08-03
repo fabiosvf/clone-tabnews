@@ -1,3 +1,4 @@
 .next
 node_modules
 .next-dev.pid
+.services-owner

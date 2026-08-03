@@ -7,6 +7,7 @@ const treeKill = require("tree-kill");
 const PORT = Number(process.env.PORT) || 3000;
 const LOCKFILE = path.join(__dirname, "..", "..", ".next-dev.pid");
 const NEXT_BIN = require.resolve("next/dist/bin/next");
+const MODE = process.argv.includes("--mode=reuse") ? "reuse" : "exclusive";
 
 function isPortFree(port) {
   return new Promise((resolve) => {
@@ -56,31 +57,7 @@ async function waitPortFree(port, timeoutMs) {
   return false;
 }
 
-async function ensurePortAvailable() {
-  if (await isPortFree(PORT)) {
-    clearLockedPid();
-    return;
-  }
-
-  const lockedPid = readLockedPid();
-
-  if (lockedPid && isProcessAlive(lockedPid)) {
-    console.warn(
-      `\n🟡 Porta ${PORT} ocupada por uma instância anterior desta aplicação (PID ${lockedPid}). Encerrando...`,
-    );
-    await killTree(lockedPid);
-    const freed = await waitPortFree(PORT, 5000);
-    clearLockedPid();
-
-    if (!freed) {
-      console.error(
-        `\n🔴 Não foi possível liberar a porta ${PORT} automaticamente. Feche o processo manualmente e tente novamente.\n`,
-      );
-      process.exit(1);
-    }
-    return;
-  }
-
+function refuseForeignProcess() {
   console.error(
     `\n🔴 A porta ${PORT} já está em uso por um processo não reconhecido por esta aplicação.\n` +
       `   Feche o que estiver usando a porta ${PORT} e tente novamente.\n`,
@@ -88,27 +65,89 @@ async function ensurePortAvailable() {
   process.exit(1);
 }
 
-async function main() {
-  await ensurePortAvailable();
+async function killGhostAndFreePort(pid) {
+  console.warn(
+    `\n🟡 Porta ${PORT} ocupada por uma instância anterior desta aplicação (PID ${pid}). Encerrando...`,
+  );
+  await killTree(pid);
+  const freed = await waitPortFree(PORT, 5000);
+  clearLockedPid();
 
-  const child = spawn(process.execPath, [NEXT_BIN, "dev", "-p", String(PORT)], {
-    stdio: "inherit",
-  });
-
-  writeLockedPid(child.pid);
-
-  const cleanupAndExit = (code) => {
-    clearLockedPid();
-    process.exit(code ?? 0);
-  };
-
-  child.on("exit", (code) => cleanupAndExit(code));
-
-  for (const signal of ["SIGINT", "SIGTERM"]) {
-    process.on(signal, () => {
-      killTree(child.pid).finally(() => cleanupAndExit(0));
-    });
+  if (!freed) {
+    console.error(
+      `\n🔴 Não foi possível liberar a porta ${PORT} automaticamente. Feche o processo manualmente e tente novamente.\n`,
+    );
+    process.exit(1);
   }
+}
+
+function attachAndWait(pid) {
+  console.log(
+    `\n🟢 Porta ${PORT} já servida por uma instância existente desta aplicação (PID ${pid}).\n` +
+      `   Reaproveitando — nenhum novo servidor será iniciado.\n`,
+  );
+
+  return new Promise((resolve) => {
+    // Mantém o event loop vivo: só um listener de sinal não é suficiente.
+    const keepAlive = setInterval(() => {}, 1 << 30);
+
+    const onSignal = () => {
+      clearInterval(keepAlive);
+      resolve();
+    };
+
+    for (const signal of ["SIGINT", "SIGTERM"]) {
+      process.on(signal, onSignal);
+    }
+  });
+}
+
+function startFresh() {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [NEXT_BIN, "dev", "-p", String(PORT)], {
+      stdio: "inherit",
+    });
+
+    writeLockedPid(child.pid);
+
+    const cleanupAndExit = (code) => {
+      clearLockedPid();
+      resolve(code ?? 0);
+    };
+
+    child.on("exit", (code) => cleanupAndExit(code));
+
+    for (const signal of ["SIGINT", "SIGTERM"]) {
+      process.on(signal, () => {
+        killTree(child.pid).finally(() => cleanupAndExit(0));
+      });
+    }
+  });
+}
+
+async function main() {
+  if (await isPortFree(PORT)) {
+    clearLockedPid();
+    const code = await startFresh();
+    process.exit(code);
+  }
+
+  const lockedPid = readLockedPid();
+  const isOurs = lockedPid && isProcessAlive(lockedPid);
+
+  if (!isOurs) {
+    refuseForeignProcess();
+    return;
+  }
+
+  if (MODE === "reuse") {
+    await attachAndWait(lockedPid);
+    process.exit(0);
+  }
+
+  await killGhostAndFreePort(lockedPid);
+  const code = await startFresh();
+  process.exit(code);
 }
 
 main();
