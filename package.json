@@ -30,7 +30,7 @@
     "cookie": "1.0.2",
     "dotenv": "16.4.5",
     "dotenv-expand": "11.0.6",
-    "next": "15.0.1",
+    "next": "15.0.7",
     "next-connect": "1.0.0",
     "node-pg-migrate": "7.7.1",
     "nodemailer": "7.0.5",
@@ -50,7 +50,7 @@
     "concurrently": "9.0.1",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "9.13.0",
-    "eslint-config-next": "15.0.1",
+    "eslint-config-next": "15.0.7",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-jest": "28.8.3",
     "husky": "9.1.6",
@@ -63,5 +63,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "engines": {
+    "node": "24"
   }
 }
