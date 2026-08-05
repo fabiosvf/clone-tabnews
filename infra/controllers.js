@@ -1,7 +1,7 @@
 import * as cookie from "cookie";
-import session from "models/session";
-import user from "models/user";
-import authorization from "models/authorization";
+import session from "models/session.js";
+import user from "models/user.js";
+import authorization from "models/authorization.js";
 
 import {
   InternalServerError,

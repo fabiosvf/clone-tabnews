@@ -1,10 +1,10 @@
 import { createRouter } from "next-connect";
-import controller from "infra/controllers";
-import authentication from "models/authentication";
-import authorization from "models/authorization";
-import session from "models/session";
+import controller from "infra/controllers.js";
+import authentication from "models/authentication.js";
+import authorization from "models/authorization.js";
+import session from "models/session.js";
 
-import { ForbiddenError } from "infra/errors";
+import { ForbiddenError } from "infra/errors.js";
 
 const router = createRouter();
 

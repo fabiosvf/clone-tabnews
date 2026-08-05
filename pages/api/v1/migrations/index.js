@@ -1,10 +1,7 @@
 import { createRouter } from "next-connect";
-// import migrationRunner from "node-pg-migrate";
-// import { resolve } from "node:path";
-// import database from "infra/database";
-import controller from "infra/controllers";
-import migrator from "models/migrator";
-import authorization from "models/authorization";
+import controller from "infra/controllers.js";
+import migrator from "models/migrator.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 

@@ -1,7 +1,7 @@
 import { createRouter } from "next-connect";
-import controller from "infra/controllers";
-import activation from "models/activation";
-import authorization from "models/authorization";
+import controller from "infra/controllers.js";
+import activation from "models/activation.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 

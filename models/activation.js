@@ -1,9 +1,9 @@
-import email from "infra/email";
-import database from "infra/database";
-import webserver from "infra/webserver";
-import { ForbiddenError, NotFoundError } from "infra/errors";
-import user from "models/user";
-import authorization from "./authorization";
+import email from "infra/email.js";
+import database from "infra/database.js";
+import webserver from "infra/webserver.js";
+import { ForbiddenError, NotFoundError } from "infra/errors.js";
+import user from "models/user.js";
+import authorization from "./authorization.js";
 
 const EXPIRATION_IN_MILISECONDS = 60 * 15 * 1000; // 15 minutes
 
