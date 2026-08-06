@@ -1,7 +1,7 @@
 import * as cookie from "cookie";
-import session from "models/session";
-import user from "models/user";
-import authorization from "models/authorization";
+import session from "models/session.js";
+import user from "models/user.js";
+import authorization from "models/authorization.js";
 
 import {
   InternalServerError,
@@ -41,17 +41,18 @@ function onErrorHandler(error, request, response) {
   response.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
-async function setSessionCookie(sessionToken, response) {
+function setSessionCookie(sessionToken, response) {
   const setCookie = cookie.serialize("session_id", sessionToken, {
     path: "/",
     maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
+    sameSite: "Lax",
   });
   response.setHeader("Set-Cookie", setCookie);
 }
 
-async function clearSessionCookie(response) {
+function clearSessionCookie(response) {
   const setCookie = cookie.serialize("session_id", "invalid", {
     path: "/",
     maxAge: -1,

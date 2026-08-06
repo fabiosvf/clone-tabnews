@@ -1,4 +1,4 @@
-import { InternalServerError } from "infra/errors";
+import { InternalServerError } from "infra/errors.js";
 import authorization from "models/authorization.js";
 
 describe("models/authorization.js", () => {

@@ -1,7 +1,8 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
-import orchestrator from "tests/orchestrator";
-import session from "models/session";
+import orchestrator from "tests/orchestrator.js";
+import session from "models/session.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -15,7 +16,7 @@ describe("DELETE /api/v1/sessions", () => {
       const nonexsistentToken =
         "ea0aa30a68ad4c545d48a5ae27c45f53f20acf39802ed2ddb6d75b2e34fdde107f8ceb6336deeab91e64d91e25892f7f";
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           cookie: `session_id=${nonexsistentToken}`,
@@ -43,11 +44,11 @@ describe("DELETE /api/v1/sessions", () => {
         username: "UserWithHExpiredSession",
       });
 
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${sessionObject.token}`,
@@ -71,9 +72,9 @@ describe("DELETE /api/v1/sessions", () => {
         username: "UserWithValidSession",
       });
 
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${sessionObject.token}`,
@@ -126,7 +127,7 @@ describe("DELETE /api/v1/sessions", () => {
 
       // Double check assertions
       const doubleCheckResponse = await fetch(
-        "http://localhost:3000/api/v1/user",
+        `${webserver.origin}/api/v1/user`,
         {
           headers: {
             Cookie: `session_id=${sessionObject.token}`,
