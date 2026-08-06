@@ -1,34 +1,55 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import globals from "globals";
+import json from "@eslint/json";
+import markdown from "@eslint/markdown";
+import css from "@eslint/css";
+import { defineConfig } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import jest from "eslint-plugin-jest";
+import prettier from "eslint-config-prettier/flat";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
-const config = [
-  ...compat.extends(
-    "eslint:recommended",
-    "plugin:jest/recommended",
-    "next/core-web-vitals",
-    "prettier",
-  ),
+export default defineConfig([
   {
-    ignores: [
-      ".next/**",
-      "dist/**",
-      "build/**",
-      "node_modules/**",
-      ".swc/**",
-      ".github/**",
-      ".husky/**",
-    ],
+    files: ["**/*.{js,mjs,cjs,jsx}"],
+    plugins: { js },
+    extends: ["js/recommended"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
-];
-
-export default config;
+  ...nextVitals,
+  {
+    files: ["tests/**/*.test.js"],
+    ...jest.configs["flat/recommended"],
+  },
+  {
+    files: ["**/*.json"],
+    plugins: { json },
+    language: "json/json",
+    extends: ["json/recommended"],
+    ignores: ["package-lock.json"],
+  },
+  {
+    files: ["**/*.jsonc"],
+    plugins: { json },
+    language: "json/jsonc",
+    extends: ["json/recommended"],
+  },
+  {
+    files: ["**/*.json5"],
+    plugins: { json },
+    language: "json/json5",
+    extends: ["json/recommended"],
+  },
+  {
+    files: ["**/*.md"],
+    plugins: { markdown },
+    language: "markdown/gfm",
+    extends: ["markdown/recommended"],
+  },
+  {
+    files: ["**/*.css"],
+    plugins: { css },
+    language: "css/css",
+    extends: ["css/recommended"],
+  },
+  prettier,
+]);
